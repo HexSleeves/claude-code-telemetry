@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Scrape metrics from OpenTelemetry Collector
+  - job_name: "claude-code-metrics"
+    static_configs:
+      - targets: ["otel-collector:8889"]
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+  # Self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
