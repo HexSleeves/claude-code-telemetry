@@ -1,7 +1,10 @@
 import { ClaudeCodeMonitor } from "./claude-code-monitor";
+import { ClaudeCodeDatadogMonitor } from "./claude-code-datadog-monitor";
 
 // Usage example
 async function main() {
+  let datadog = process.argv.includes("--datadog");
+
   let pollInterval = process.argv.includes("--poll")
     ? parseInt(process.argv[3])
     : -1;

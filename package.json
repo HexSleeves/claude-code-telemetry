@@ -1,13 +1,17 @@
 {
   "name": "claude-code-telemetry",
   "version": "0.1.0",
-  "description": "Claude Code telemetry monitoring with Grafana",
+  "description": "Claude Code telemetry monitoring with Grafana and Datadog",
   "main": "dist/claude-code-monitor.js",
   "scripts": {
     "build": "tsc",
-    "start": "bun run build && node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "monitor": "ts-node src/index.ts --poll",
+    "start": "node dist/claude-code-monitor.js",
+    "dev": "ts-node claude-code-monitor.ts",
+    "monitor": "ts-node claude-code-monitor.ts",
+    "monitor-datadog": "ts-node claude-code-datadog-monitor.ts",
+    "setup-datadog": "./setup-datadog.sh",
+    "test-datadog": "./test-datadog-setup.sh",
+    "configure-claude": "./configure-claude-datadog.sh",
     "clean": "rm -rf dist"
   },
   "dependencies": {
@@ -23,7 +27,9 @@
     "telemetry",
     "monitoring",
     "grafana",
-    "prometheus"
+    "prometheus",
+    "datadog",
+    "opentelemetry"
   ],
   "author": "Jacob Lecoq",
   "license": "MIT"

@@ -75,8 +75,9 @@ This project provides a complete solution for monitoring Claude Code usage and p
         This script configures your system to send metrics to Datadog. You will need your Datadog API key.
 
         ```bash
-        chmod +x setup-claude-code-datadog.sh
-        ./setup-claude-code-datadog.sh
+        export DD_API_KEY="your_datadog_api_key_here"
+        chmod +x setup-datadog.sh
+        ./setup-datadog.sh
         ```
 
 4. **Set up environment variables:**

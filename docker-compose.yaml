@@ -11,6 +11,8 @@ services:
       - "8889:8889"   # Prometheus metrics endpoint
     depends_on:
       - prometheus
+    profiles:
+      - default
 
   # Prometheus
   prometheus:
@@ -28,6 +30,9 @@ services:
       - prometheus_data:/prometheus
     ports:
       - "9090:9090"
+    profiles:
+      - default
+      - datadog
 
   # Grafana
   grafana:
@@ -43,33 +48,46 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
+    profiles:
+      - default
+      - datadog
 
   # Datadog Agent (Optional)
   datadog-agent:
-    image: gcr.io/datadoghq/agent:latest
+    image: gcr.io/datadoghq/agent:7
     container_name: datadog-agent
     environment:
       - DD_API_KEY=${DD_API_KEY:-your_datadog_api_key_here}
       - DD_SITE=${DD_SITE:-datadoghq.com}
-      - DD_LOGS_ENABLED=true
-      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
-      - DD_CONTAINER_EXCLUDE_LOGS="name:datadog-agent"
-      - DD_APM_ENABLED=true
-      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_HOSTNAME=claude-code-host
+      - DD_TAGS=env:dev,team:engineering,service:claude-code
+      - DD_OTLP_CONFIG_METRICS_ENABLED=true
       - DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_GRPC_ENDPOINT=0.0.0.0:4317
       - DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_HTTP_ENDPOINT=0.0.0.0:4318
+      - DD_LOG_LEVEL=info
+      - DD_LOGS_ENABLED=true
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "8125:8125/udp"   # DogStatsD
+      - "8126:8126"   # APM traces
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /proc/:/host/proc/:ro
-      - /opt/datadog-agent/run:/opt/datadog-agent/run:rw
       - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
-    ports:
-      - "8126:8126"   # APM traces
-      - "8125:8125"   # DogStatsD
+      - datadog-agent-run:/opt/datadog-agent/run:rw
+      - ./datadog/datadog.yaml:/etc/datadog-agent/datadog.yaml:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "agent", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     profiles:
       - datadog
 
 volumes:
   prometheus_data:
   grafana_data:
+  datadog-agent-run:
