@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Claude Code telemetry monitoring system that sets up comprehensive observability using OpenTelemetry, Prometheus, and Grafana. The project monitors Claude Code usage metrics including sessions, token consumption, costs, and productivity metrics like lines of code and commits.
+This is a Claude Code telemetry monitoring system that sets up comprehensive observability using OpenTelemetry, Prometheus, Grafana, and optionally Datadog. The project monitors Claude Code usage metrics including sessions, token consumption, costs, and productivity metrics like lines of code and commits.
 
 ## Architecture
 
@@ -12,11 +12,14 @@ The system follows a telemetry pipeline pattern:
 
 ```mermaid
 Claude Code → OpenTelemetry Collector → Prometheus → Grafana
+                ↓
+            Datadog (Optional)
 ```
 
 - **OpenTelemetry Collector**: Receives telemetry data from Claude Code via OTLP (gRPC/HTTP)
 - **Prometheus**: Stores metrics with `claude_code` namespace
 - **Grafana**: Provides visualization dashboards
+- **Datadog**: Optional cloud monitoring service for logs and metrics
 - **TypeScript Monitor**: Programmatic client for querying metrics
 
 ## Essential Commands
@@ -41,10 +44,16 @@ npm start
 
 ```bash
 # Initial setup (sets environment variables and starts services)
-./setup-claude-code-telemetry.sh
+./scripts/setup-claude-code-telemetry.sh
+
+# Setup with Datadog (requires DD_API_KEY environment variable)
+./scripts/setup-claude-code-datadog.sh
 
 # Start all services
 docker-compose up -d
+
+# Start services with Datadog
+docker-compose --profile datadog up -d
 
 # View logs
 docker-compose logs -f
@@ -68,6 +77,13 @@ export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
 export OTEL_METRIC_EXPORT_INTERVAL=30000
 ```
 
+#### Additional Variables for Datadog Integration
+
+```bash
+export DD_API_KEY=your_datadog_api_key_here
+export DD_SITE=datadoghq.com  # or datadoghq.eu, us3.datadoghq.com, etc.
+```
+
 ## Key Components
 
 ### ClaudeCodeMonitor (`claude-code-monitor.ts`)
@@ -89,6 +105,7 @@ export OTEL_METRIC_EXPORT_INTERVAL=30000
 - **Grafana**: <http://localhost:3000> (admin/admin)
 - **Prometheus**: <http://localhost:9090>
 - **OpenTelemetry Collector**: localhost:4317 (gRPC), localhost:4318 (HTTP)
+- **Datadog**: https://app.datadoghq.com (when enabled)
 
 ## Tracked Metrics
 
@@ -117,3 +134,10 @@ The system monitors these Claude Code metrics:
 3. Check Prometheus targets: <http://localhost:9090/targets>
 4. Verify Claude Code telemetry is enabled with environment variables
 5. Test metrics appear in Prometheus after running Claude Code commands
+
+### Datadog-specific Troubleshooting
+
+1. Verify DD_API_KEY is set: `echo $DD_API_KEY`
+2. Check Datadog Agent logs: `docker-compose logs datadog-agent`
+3. Verify metrics in Datadog: Search for `claude_code.*` metrics
+4. Check OpenTelemetry Collector logs for Datadog export errors

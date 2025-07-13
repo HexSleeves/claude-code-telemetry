@@ -4,7 +4,9 @@
 
 This project provides a complete solution for monitoring Claude Code usage and performance. It uses OpenTelemetry to collect detailed metrics, Prometheus to store them, and Grafana to visualize them in a pre-configured dashboard.
 
-![Claude Code Dashboard](https://raw.githubusercontent.com/jlecoq/claude-code-telemetry/main/grafana/dashboards/claude-code-dashboard.png)
+<p align="center">
+  <img src="screenshots/grafana_claude_dash.png" width="600" alt="Claude Code Dashboard">
+</p>
 
 ## ✨ Features
 
@@ -13,6 +15,15 @@ This project provides a complete solution for monitoring Claude Code usage and p
 - **Performance Metrics**: Track session duration, lines of code changes, and more.
 - **Extensible**: Easily add new metrics and visualizations.
 - **Simple Setup**: Get up and running with a single script.
+
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td><img src="screenshots/grafana_claude_dash.png" width="500" alt="Claude Code Dashboard"></td>
+    <td><img src="screenshots/prometheus_targets.png" width="500" alt="Prometheus Targets"></td>
+  </tr>
+</table>
 
 ## 🛠️ Prerequisites
 

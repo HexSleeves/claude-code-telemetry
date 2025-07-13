@@ -25,6 +25,17 @@ exporters:
     const_labels:
       environment: production
 
+  # Datadog exporter (Optional)
+  datadog:
+    api:
+      site: ${DD_SITE}
+      key: ${DD_API_KEY}
+    metrics:
+      endpoint: https://api.${DD_SITE}
+      resource_attributes_as_tags: true
+    traces:
+      endpoint: https://trace.agent.${DD_SITE}
+
   # Optional: Also log metrics for debugging
   debug:
     verbosity: detailed
@@ -35,5 +46,11 @@ service:
       receivers: [otlp]
       processors: [batch, resource]
       exporters: [prometheus, debug]
+
+    # Datadog pipeline (enabled when DD_API_KEY is set)
+    metrics/datadog:
+      receivers: [otlp]
+      processors: [batch, resource]
+      exporters: [datadog]
 
   extensions: []
