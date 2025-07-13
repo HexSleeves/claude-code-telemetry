@@ -1,8 +1,8 @@
-# Claude Code Telemetry with Grafana
+# Claude Code Telemetry with Grafana and Datadog
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This project provides a complete solution for monitoring Claude Code usage and performance. It uses OpenTelemetry to collect detailed metrics, Prometheus to store them, and Grafana to visualize them in a pre-configured dashboard.
+This project provides a complete solution for monitoring Claude Code usage and performance. It uses OpenTelemetry to collect detailed metrics and supports two backends for storage and visualization: Prometheus/Grafana and Datadog.
 
 <p align="center">
   <img src="screenshots/grafana_claude_dash.png" width="600" alt="Claude Code Dashboard">
@@ -10,13 +10,16 @@ This project provides a complete solution for monitoring Claude Code usage and p
 
 ## ✨ Features
 
-- **Comprehensive Dashboards**: Visualize key metrics in Grafana.
+- **Dual Backend Support**: Choose between Prometheus/Grafana or Datadog for monitoring.
+- **Comprehensive Dashboards**: Visualize key metrics in Grafana or Datadog.
 - **Cost Tracking**: Monitor token usage and associated costs.
 - **Performance Metrics**: Track session duration, lines of code changes, and more.
 - **Extensible**: Easily add new metrics and visualizations.
-- **Simple Setup**: Get up and running with a single script.
+- **Simple Setup**: Get up and running with a single script for your chosen backend.
 
 ## 📸 Screenshots
+
+### Grafana
 
 <table>
   <tr>
@@ -25,9 +28,13 @@ This project provides a complete solution for monitoring Claude Code usage and p
   </tr>
 </table>
 
+### Datadog
+
+*(Datadog dashboard screenshot coming soon)*
+
 ## 🛠️ Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/)
+- [Docker](https://docs.docker.com/get-docker/) (for Grafana/Prometheus stack)
 - [Node.js](https://nodejs.org/en/download/) (v18 or higher)
 - `npm` (or your preferred package manager)
 
@@ -46,14 +53,31 @@ This project provides a complete solution for monitoring Claude Code usage and p
     npm install
     ```
 
-3. **Run the setup script:**
+3. **Choose your monitoring backend:**
 
-    This script makes the necessary shell scripts executable.
+    - **For Grafana/Prometheus (Default):**
 
-    ```bash
-    chmod +x setup-claude-code-telemetry.sh
-    ./setup-claude-code-telemetry.sh
-    ```
+        This script makes the necessary shell scripts executable.
+
+        ```bash
+        chmod +x setup-claude-code-telemetry.sh
+        ./setup-claude-code-telemetry.sh
+        ```
+
+        Then start the monitoring stack:
+
+        ```bash
+        docker-compose up -d
+        ```
+
+    - **For Datadog:**
+
+        This script configures your system to send metrics to Datadog. You will need your Datadog API key.
+
+        ```bash
+        chmod +x setup-claude-code-datadog.sh
+        ./setup-claude-code-datadog.sh
+        ```
 
 4. **Set up environment variables:**
 
@@ -64,18 +88,13 @@ This project provides a complete solution for monitoring Claude Code usage and p
     source ~/.zshrc # Or ~/.bashrc
     ```
 
-5. **Start the monitoring stack:**
-
-    ```bash
-    docker-compose up -d
-    ```
-
-6. **Access the dashboards:**
+5. **Access the dashboards:**
     - **Grafana**: <http://localhost:3000> (login with `admin`/`admin`)
     - **Prometheus**: <http://localhost:9090>
+    - **Datadog**: Log in to your Datadog account to view the dashboard.
     - **OpenTelemetry Collector**: `localhost:4317` (gRPC), `localhost:4318` (HTTP)
 
-7. **Generate Telemetry Data:**
+6. **Generate Telemetry Data:**
 
     Run any Claude Code command in your terminal. The environment variables you set earlier will automatically route the telemetry data to the collector.
 
@@ -89,7 +108,9 @@ This project provides a complete solution for monitoring Claude Code usage and p
 
 ## 🏛️ Architecture
 
-The architecture is straightforward:
+The architecture supports two backends:
+
+### Prometheus/Grafana
 
 ```mermaid
 graph TD
@@ -98,10 +119,19 @@ graph TD
     C -->|Prometheus Datasource| D(Grafana);
 ```
 
+### Datadog
+
+```mermaid
+graph TD
+    A[Claude Code] -->|OTLP Exporter| B(OpenTelemetry Collector);
+    B -->|Datadog Exporter| C(Datadog);
+```
+
 - **Claude Code**: Generates telemetry data using its built-in OpenTelemetry instrumentation.
-- **OpenTelemetry Collector**: Receives data from Claude Code, processes it, and exposes it to Prometheus.
+- **OpenTelemetry Collector**: Receives data from Claude Code, processes it, and exports it to either Prometheus or Datadog.
 - **Prometheus**: Scrapes and stores the metrics from the collector.
 - **Grafana**: Queries Prometheus and visualizes the data in a dashboard.
+- **Datadog**: Receives metrics from the collector for visualization and analysis.
 
 ## 📝 Environment Variables
 
@@ -119,8 +149,10 @@ export OTEL_METRIC_EXPORT_INTERVAL=30000 # 30 seconds for testing
 
 | Command | Description |
 | :--- | :--- |
-| `./setup-env.sh` | Sets up the required environment variables. |
-| `docker-compose up -d` | Starts all services in detached mode. |
+| `./setup-claude-code-telemetry.sh` | Sets up the Prometheus/Grafana stack. |
+| `./setup-claude-code-datadog.sh` | Sets up the Datadog integration. |
+| `./setup-env.sh` | Sets up the required environment variables for telemetry. |
+| `docker-compose up -d` | Starts all services for the Grafana stack in detached mode. |
 | `docker-compose logs -f` | Tails the logs of all running services. |
 | `docker-compose down` | Stops and removes all services. |
 | `./test-setup.sh` | Runs a script to test the setup. |
@@ -155,7 +187,7 @@ printReport();
 
 ## 🔍 Troubleshooting
 
-1. **Verify services are running:**
+1. **Verify services are running (Grafana/Prometheus stack):**
 
     ```bash
     docker-compose ps
