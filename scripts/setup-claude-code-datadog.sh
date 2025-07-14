@@ -16,12 +16,13 @@ fi
 
 # Set default Datadog site if not provided
 export DD_SITE=${DD_SITE:-datadoghq.com}
+export DD_HOSTNAME=${DD_HOSTNAME:-claude-code-host}
 
 # Set Claude Code environment variables
 export CLAUDE_CODE_ENABLE_TELEMETRY=1
 export OTEL_METRICS_EXPORTER=otlp
 export OTEL_EXPORTER_OTLP_PROTOCOL=grpc
-export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://$DD_HOSTNAME:4317
 export OTEL_METRIC_EXPORT_INTERVAL=10000 # 10 seconds as per documentation
 
 echo "✅ Set Claude Code environment variables"
@@ -39,10 +40,11 @@ echo "# Claude Code Telemetry with Datadog" >>"$PROFILE_FILE"
 echo "export CLAUDE_CODE_ENABLE_TELEMETRY=1" >>"$PROFILE_FILE"
 echo "export OTEL_METRICS_EXPORTER=otlp" >>"$PROFILE_FILE"
 echo "export OTEL_EXPORTER_OTLP_PROTOCOL=grpc" >>"$PROFILE_FILE"
-echo "export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317" >>"$PROFILE_FILE"
+echo "export OTEL_EXPORTER_OTLP_ENDPOINT=http://$DD_HOSTNAME:4317" >>"$PROFILE_FILE"
 echo "export OTEL_METRIC_EXPORT_INTERVAL=10000" >>"$PROFILE_FILE"
 echo "export DD_API_KEY=$DD_API_KEY" >>"$PROFILE_FILE"
 echo "export DD_SITE=$DD_SITE" >>"$PROFILE_FILE"
+echo "export DD_HOSTNAME=$DD_HOSTNAME" >>"$PROFILE_FILE"
 
 echo "✅ Added environment variables to $PROFILE_FILE"
 

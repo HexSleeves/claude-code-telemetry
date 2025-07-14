@@ -1,5 +1,5 @@
 api_key: "${DD_API_KEY}"
-hostname: "claude-code-host"
+hostname: "${DD_HOSTNAME}"
 log_level: "info"
 logs_enabled: true
 otlp_config:

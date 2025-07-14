@@ -62,7 +62,7 @@ services:
     environment:
       - DD_API_KEY=${DD_API_KEY}
       - DD_SITE=${DD_SITE:-us5.datadoghq.com}
-      - DD_HOSTNAME=claude-code-host
+      - DD_HOSTNAME=${DD_HOSTNAME:-claude-code-host}
       - DD_TAGS=env:dev,team:engineering,service:claude-code
       - DD_OTLP_CONFIG_METRICS_ENABLED=true
       - DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_GRPC_ENDPOINT=0.0.0.0:4317
