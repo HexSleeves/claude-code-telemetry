@@ -1,0 +1,24 @@
+api_key: "${DD_API_KEY}"
+hostname: "claude-code-host"
+log_level: "info"
+logs_enabled: true
+otlp_config:
+  metrics:
+    enabled: true
+  receiver:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http.endpoint: "0.0.0.0:4318"
+proxy:
+  http: ""
+  https: ""
+  no_proxy: ["169.254.169.254", "100.100.100.200"]
+python_version: "3"
+secret_backend_command_allow_group_exec_perm: true
+security_agent:
+  internal_profiling:
+    api_key: "${DD_API_KEY}"
+    site: "${DD_SITE}"
+site: "${DD_SITE}"
+tags: ["env:dev,team:engineering,service:claude-code"]

@@ -5,6 +5,9 @@ services:
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_SITE=${DD_SITE:-us5.datadoghq.com}
     ports:
       - "4317:4317"   # OTLP gRPC receiver
       - "4318:4318"   # OTLP HTTP receiver
@@ -57,8 +60,8 @@ services:
     image: gcr.io/datadoghq/agent:7
     container_name: datadog-agent
     environment:
-      - DD_API_KEY=${DD_API_KEY:-your_datadog_api_key_here}
-      - DD_SITE=${DD_SITE:-datadoghq.com}
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_SITE=${DD_SITE:-us5.datadoghq.com}
       - DD_HOSTNAME=claude-code-host
       - DD_TAGS=env:dev,team:engineering,service:claude-code
       - DD_OTLP_CONFIG_METRICS_ENABLED=true

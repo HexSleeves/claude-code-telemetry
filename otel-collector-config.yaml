@@ -1,4 +1,14 @@
 receivers:
+  hostmetrics:
+    scrapers:
+      load:
+      cpu:
+      disk:
+      filesystem:
+      memory:
+      network:
+      paging:
+      process:
   otlp:
     protocols:
       grpc:
@@ -43,7 +53,7 @@ exporters:
 service:
   pipelines:
     metrics:
-      receivers: [otlp]
+      receivers: [otlp, hostmetrics]
       processors: [batch, resource]
       exporters: [prometheus, debug]
 
