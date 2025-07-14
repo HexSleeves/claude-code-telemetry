@@ -28,16 +28,16 @@ Claude Code → OpenTelemetry Collector → Prometheus → Grafana
 
 ```bash
 # Build TypeScript
-npm run build
+bun run build
 
 # Run monitoring script in development
-npm run dev
+bun run dev
 
 # Generate usage report
-npm run monitor
+bun run monitor
 
 # Start monitoring service
-npm start
+bun run start
 ```
 
 ### Infrastructure
@@ -105,7 +105,7 @@ export DD_SITE=datadoghq.com  # or datadoghq.eu, us3.datadoghq.com, etc.
 - **Grafana**: <http://localhost:3000> (admin/admin)
 - **Prometheus**: <http://localhost:9090>
 - **OpenTelemetry Collector**: localhost:4317 (gRPC), localhost:4318 (HTTP)
-- **Datadog**: https://app.datadoghq.com (when enabled)
+- **Datadog**: <https://app.datadoghq.com> (when enabled)
 
 ## Tracked Metrics
 

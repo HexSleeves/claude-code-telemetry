@@ -36,7 +36,7 @@ This project provides a complete solution for monitoring Claude Code usage and p
 
 - [Docker](https://docs.docker.com/get-docker/) (for Grafana/Prometheus stack)
 - [Node.js](https://nodejs.org/en/download/) (v18 or higher)
-- `npm` (or your preferred package manager)
+- `bun` (or your preferred package manager)
 
 ## 🚀 Quick Start
 
@@ -50,7 +50,7 @@ This project provides a complete solution for monitoring Claude Code usage and p
 2. **Install dependencies:**
 
     ```bash
-    npm install
+    bun install
     ```
 
 3. **Choose your monitoring backend:**
@@ -157,9 +157,9 @@ export OTEL_METRIC_EXPORT_INTERVAL=30000 # 30 seconds for testing
 | `docker-compose logs -f` | Tails the logs of all running services. |
 | `docker-compose down` | Stops and removes all services. |
 | `./test-setup.sh` | Runs a script to test the setup. |
-| `npm run monitor` | Generates a usage report in the console. |
-| `npm run build` | Compiles the TypeScript code. |
-| `npm run dev` | Runs the monitoring script in development mode. |
+| `bun run monitor` | Generates a usage report in the console. |
+| `bun run build` | Compiles the TypeScript code. |
+| `bun run dev` | Runs the monitoring script in development mode. |
 
 ## 📈 Monitoring Client
 
