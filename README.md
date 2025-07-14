@@ -30,7 +30,11 @@ This project provides a complete solution for monitoring Claude Code usage and p
 
 ### Datadog
 
-*(Datadog dashboard screenshot coming soon)*
+<table>
+  <tr>
+    <td><img src="screenshots/datadog_claude_dash.png" width="500" alt="Claude Code Dashboard"></td>
+  </tr>
+</table>
 
 ## 🛠️ Prerequisites
 
