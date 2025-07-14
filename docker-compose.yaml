@@ -1,13 +1,10 @@
 services:
-  # OpenTelemetry Collector
+  # OpenTelemetry Collector (without Datadog)
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
-      - ./config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
-    environment:
-      - DD_API_KEY=${DD_API_KEY}
-      - DD_SITE=${DD_SITE:-us5.datadoghq.com}
+      - ./config/otel-collector-config-base.yaml:/etc/otel-collector-config.yaml
     ports:
       - "4317:4317"   # OTLP gRPC receiver
       - "4318:4318"   # OTLP HTTP receiver
@@ -16,6 +13,24 @@ services:
       - prometheus
     profiles:
       - default
+
+  # OpenTelemetry Collector (with Datadog support)
+  otel-collector-datadog:
+    image: otel/opentelemetry-collector-contrib:latest
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./config/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_SITE=${DD_SITE:-datadoghq.com}
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "8889:8889"   # Prometheus metrics endpoint
+    depends_on:
+      - prometheus
+    profiles:
+      - datadog
 
   # Prometheus
   prometheus:
@@ -55,42 +70,7 @@ services:
       - default
       - datadog
 
-  # Datadog Agent (Optional)
-  datadog-agent:
-    image: gcr.io/datadoghq/agent:7
-    container_name: datadog-agent
-    environment:
-      - DD_API_KEY=${DD_API_KEY}
-      - DD_SITE=${DD_SITE:-us5.datadoghq.com}
-      - DD_HOSTNAME=${DD_HOSTNAME:-claude-code-host}
-      - DD_TAGS=env:dev,team:engineering,service:claude-code
-      - DD_OTLP_CONFIG_METRICS_ENABLED=true
-      - DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_GRPC_ENDPOINT=0.0.0.0:4317
-      - DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_HTTP_ENDPOINT=0.0.0.0:4318
-      - DD_LOG_LEVEL=info
-      - DD_LOGS_ENABLED=true
-    ports:
-      - "4317:4317"   # OTLP gRPC receiver
-      - "4318:4318"   # OTLP HTTP receiver
-      - "8125:8125/udp"   # DogStatsD
-      - "8126:8126"   # APM traces
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /proc/:/host/proc/:ro
-      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
-      - datadog-agent-run:/opt/datadog-agent/run:rw
-      - ./config/datadog/datadog.yaml:/etc/datadog-agent/datadog.yaml:ro
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "agent", "health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    profiles:
-      - datadog
 
 volumes:
   prometheus_data:
   grafana_data:
-  datadog-agent-run:

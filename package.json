@@ -6,12 +6,10 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/claude-code-monitor.js",
-    "dev": "ts-node claude-code-monitor.ts",
-    "monitor": "ts-node claude-code-monitor.ts",
-    "monitor-datadog": "ts-node claude-code-datadog-monitor.ts",
-    "setup-datadog": "./setup-datadog.sh",
-    "test-datadog": "./test-datadog-setup.sh",
-    "configure-claude": "./configure-claude-datadog.sh",
+    "dev": "ts-node src/claude-code-monitor.ts",
+    "dev:datadog": "ts-node src/claude-code-datadog-monitor.ts",
+    "setup:datadog": "./scripts/setup-claude-datadog.sh",
+    "setup:claude": "./scripts/setup-claude-code-telemetry.sh",
     "clean": "rm -rf dist"
   },
   "dependencies": {

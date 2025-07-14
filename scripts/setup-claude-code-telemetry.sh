@@ -23,12 +23,19 @@ else
     PROFILE_FILE="$HOME/.bashrc"
 fi
 
-echo "# Claude Code Telemetry" >>"$PROFILE_FILE"
-echo "export CLAUDE_CODE_ENABLE_TELEMETRY=1" >>"$PROFILE_FILE"
-echo "export OTEL_METRICS_EXPORTER=otlp" >>"$PROFILE_FILE"
-echo "export OTEL_EXPORTER_OTLP_PROTOCOL=grpc" >>"$PROFILE_FILE"
-echo "export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317" >>"$PROFILE_FILE"
-echo "export OTEL_METRIC_EXPORT_INTERVAL=10000" >>"$PROFILE_FILE"
+# Ask the user if they want to add the environment variables to the profile file
+read -p "Do you want to add the environment variables to the profile file? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    {
+        echo "# Claude Code Telemetry"
+        echo "export CLAUDE_CODE_ENABLE_TELEMETRY=1"
+        echo "export OTEL_METRICS_EXPORTER=otlp"
+        echo "export OTEL_EXPORTER_OTLP_PROTOCOL=grpc"
+        echo "export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317"
+        echo "export OTEL_METRIC_EXPORT_INTERVAL=10000"
+    } >>"$PROFILE_FILE"
+fi
 
 echo "✅ Added environment variables to $PROFILE_FILE"
 

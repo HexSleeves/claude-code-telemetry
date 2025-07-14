@@ -36,20 +36,27 @@ else
     PROFILE_FILE="$HOME/.bashrc"
 fi
 
-echo "# Claude Code Telemetry with Datadog" >>"$PROFILE_FILE"
-echo "export CLAUDE_CODE_ENABLE_TELEMETRY=1" >>"$PROFILE_FILE"
-echo "export OTEL_METRICS_EXPORTER=otlp" >>"$PROFILE_FILE"
-echo "export OTEL_EXPORTER_OTLP_PROTOCOL=grpc" >>"$PROFILE_FILE"
-echo "export OTEL_EXPORTER_OTLP_ENDPOINT=http://$DD_HOSTNAME:4317" >>"$PROFILE_FILE"
-echo "export OTEL_METRIC_EXPORT_INTERVAL=10000" >>"$PROFILE_FILE"
-echo "export DD_API_KEY=$DD_API_KEY" >>"$PROFILE_FILE"
-echo "export DD_SITE=$DD_SITE" >>"$PROFILE_FILE"
-echo "export DD_HOSTNAME=$DD_HOSTNAME" >>"$PROFILE_FILE"
+# Ask the user if they want to add the environment variables to the profile file
+read -p "Do you want to add the environment variables to the profile file? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    {
+        echo "# Claude Code Telemetry with Datadog"
+        echo "export CLAUDE_CODE_ENABLE_TELEMETRY=1"
+        echo "export OTEL_METRICS_EXPORTER=otlp"
+        echo "export OTEL_EXPORTER_OTLP_PROTOCOL=grpc"
+        echo "export OTEL_EXPORTER_OTLP_ENDPOINT=http://$DD_HOSTNAME:4317"
+        echo "export OTEL_METRIC_EXPORT_INTERVAL=10000"
+        echo "export DD_API_KEY=$DD_API_KEY"
+        echo "export DD_SITE=$DD_SITE"
+        echo "export DD_HOSTNAME=$DD_HOSTNAME"
+    } >>"$PROFILE_FILE"
+fi
 
 echo "✅ Added environment variables to $PROFILE_FILE"
 
-# Start the services with Datadog profile
-echo "🐳 Starting services with Docker Compose (including Datadog)..."
+# Start the services with Datadog profile (uses OpenTelemetry collector with Datadog exporter)
+echo "🐳 Starting services with Docker Compose (including Datadog support)..."
 docker-compose --profile datadog up -d
 
 # Wait for services to be ready
@@ -60,7 +67,7 @@ echo ""
 echo "Services are now running:"
 echo "  📊 Grafana: http://localhost:3000 (admin/admin)"
 echo "  📈 Prometheus: http://localhost:9090"
-echo "  🐕 Datadog Agent: Running (logs and metrics sent to $DD_SITE)"
+echo "  🐕 Datadog Integration: Metrics sent via OpenTelemetry to $DD_SITE"
 echo "  🔧 OpenTelemetry Collector: localhost:4317 (gRPC), localhost:4318 (HTTP)"
 echo ""
 echo "To test the setup:"

@@ -61,27 +61,22 @@ This project provides a complete solution for monitoring Claude Code usage and p
 
     - **For Grafana/Prometheus (Default):**
 
-        This script makes the necessary shell scripts executable.
+        This script sets up the basic monitoring stack without Datadog integration.
 
         ```bash
-        chmod +x setup-claude-code-telemetry.sh
-        ./setup-claude-code-telemetry.sh
+        chmod +x scripts/setup-claude-code-telemetry.sh
+        ./scripts/setup-claude-code-telemetry.sh
         ```
 
-        Then start the monitoring stack:
+    - **For Datadog (Optional):**
 
-        ```bash
-        docker-compose up -d
-        ```
-
-    - **For Datadog:**
-
-        This script configures your system to send metrics to Datadog. You will need your Datadog API key.
+        This script configures your system to send metrics to both Prometheus/Grafana AND Datadog. You will need your Datadog API key.
 
         ```bash
         export DD_API_KEY="your_datadog_api_key_here"
-        chmod +x setup-datadog.sh
-        ./setup-datadog.sh
+        export DD_SITE="datadoghq.com"  # or your specific Datadog site
+        chmod +x scripts/setup-datadog.sh
+        ./scripts/setup-datadog.sh
         ```
 
 4. **Set up environment variables:**
@@ -113,9 +108,9 @@ This project provides a complete solution for monitoring Claude Code usage and p
 
 ## 🏛️ Architecture
 
-The architecture supports two backends:
+The architecture supports Prometheus/Grafana as the primary backend with optional Datadog integration:
 
-### Prometheus/Grafana
+### Default Setup (Prometheus/Grafana)
 
 ```mermaid
 graph TD
@@ -124,19 +119,21 @@ graph TD
     C -->|Prometheus Datasource| D(Grafana);
 ```
 
-### Datadog
+### With Optional Datadog Integration
 
 ```mermaid
 graph TD
     A[Claude Code] -->|OTLP Exporter| B(OpenTelemetry Collector);
-    B -->|Datadog Exporter| C(Datadog);
+    B -->|Prometheus Exporter| C(Prometheus);
+    B -->|Datadog Exporter| E(Datadog);
+    C -->|Prometheus Datasource| D(Grafana);
 ```
 
 - **Claude Code**: Generates telemetry data using its built-in OpenTelemetry instrumentation.
-- **OpenTelemetry Collector**: Receives data from Claude Code, processes it, and exports it to either Prometheus or Datadog.
+- **OpenTelemetry Collector**: Receives data from Claude Code, processes it, and exports it to Prometheus (always) and optionally to Datadog (when configured).
 - **Prometheus**: Scrapes and stores the metrics from the collector.
 - **Grafana**: Queries Prometheus and visualizes the data in a dashboard.
-- **Datadog**: Receives metrics from the collector for visualization and analysis.
+- **Datadog**: Optionally receives metrics from the collector for additional visualization and analysis.
 
 ## 📝 Environment Variables
 
@@ -154,13 +151,14 @@ export OTEL_METRIC_EXPORT_INTERVAL=30000 # 30 seconds for testing
 
 | Command | Description |
 | :--- | :--- |
-| `./setup-claude-code-telemetry.sh` | Sets up the Prometheus/Grafana stack. |
-| `./setup-claude-code-datadog.sh` | Sets up the Datadog integration. |
-| `./setup-env.sh` | Sets up the required environment variables for telemetry. |
-| `docker-compose up -d` | Starts all services for the Grafana stack in detached mode. |
-| `docker-compose logs -f` | Tails the logs of all running services. |
-| `docker-compose down` | Stops and removes all services. |
-| `./test-setup.sh` | Runs a script to test the setup. |
+| `./scripts/setup-claude-code-telemetry.sh` | Sets up the basic Prometheus/Grafana stack (no Datadog). |
+| `./scripts/setup-datadog.sh` | Sets up the full stack with Datadog integration. |
+| `docker-compose --profile default up -d` | Starts basic services (Prometheus/Grafana only). |
+| `docker-compose --profile datadog up -d` | Starts all services including Datadog integration. |
+| `docker-compose --profile default logs -f` | Tails logs for basic setup. |
+| `docker-compose --profile datadog logs -f` | Tails logs for Datadog setup. |
+| `docker-compose --profile default down` | Stops basic services. |
+| `docker-compose --profile datadog down` | Stops all services including Datadog. |
 | `bun run monitor` | Generates a usage report in the console. |
 | `bun run build` | Compiles the TypeScript code. |
 | `bun run dev` | Runs the monitoring script in development mode. |

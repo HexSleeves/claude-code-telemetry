@@ -9,19 +9,19 @@ interface DatadogMetricsQuery {
 interface DatadogMetricsResponse {
   status: string;
   res_type: string;
-  series: Array<{
+  series: {
     metric: string;
     attributes: Record<string, string>;
     display_name: string;
-    unit: Array<{
+    unit: {
       family: string;
       scale_factor: number;
       name: string;
       short_name: string;
       plural: string;
       id: number;
-    }>;
-    pointlist: Array<[number, number]>;
+    };
+    pointlist: [number, number][];
     start: number;
     end: number;
     interval: number;
@@ -29,7 +29,7 @@ interface DatadogMetricsResponse {
     aggr: string;
     scope: string;
     expression: string;
-  }>;
+  }[];
   values: Record<string, number>;
   from_date: number;
   to_date: number;
